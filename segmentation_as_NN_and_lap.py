@@ -217,7 +217,7 @@ def tract_correspondence_multiple_example_lap (kdt_T_A,  prototypes_T_A,example_
     show_tract(segmented_tract_LAP,color)                                                     
     
 
-########################################
+
 
 def tract_segmentation_single_example_NN (kdt_T_A,  prototypes_T_A,sid, num_NN,T_A ):                            
     """ step:1 tract segmentation from single example using lapjv
