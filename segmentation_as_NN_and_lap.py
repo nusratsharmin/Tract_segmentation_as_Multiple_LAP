@@ -141,7 +141,7 @@ def chunker(seq, size):
  
 
 def tract_segmentation_single_example_lap (kdt_T_A,  prototypes_T_A,sid, num_NN,T_A ):                            
-    """ step:1 tract segmentation from single example using lapjv
+    """ step 1: tract segmentation from a single example using Jonker-Volgenant algorithm (LAPJV)
     """        
     E_t_filename= 'data/example/'+ str(sid) +'_'+str(tract_name)+'.trk'
     
@@ -174,18 +174,19 @@ def tract_segmentation_single_example_lap (kdt_T_A,  prototypes_T_A,sid, num_NN,
 
 
 def tract_correspondence_multiple_example_lap (kdt_T_A,  prototypes_T_A,example_sunject_id_list, num_NN ):
-    """ step:2 tract segmentation using multiple example
+    """ step:2 tracts generated from each example are merged together and then filtered 
+        in order to obtain the final segmentation of the desired tract
     """    
     print("Extracting the estimated target tract (superset) using the RLAP")
     n_jobs=-1
    
-      #result_RLAP= np.array(Parallel(n_jobs=n_jobs)(delayed(NN)(kdt, prototypes,sid,1,tractogram )for sid in   example_subject_id_list ))
-    result_RLAP= np.array(Parallel(n_jobs=n_jobs)(delayed(tract_segmentation_single_example_lap)(kdt_T_A,  prototypes_T_A,sid, num_NN,T_A ) for sid in   example_sunject_id_list ))#euclidean                            
+      
+    result_LAP= np.array(Parallel(n_jobs=n_jobs)(delayed(tract_segmentation_single_example_lap)(kdt_T_A,  prototypes_T_A,sid, num_NN,T_A ) for sid in   example_sunject_id_list ))                        
 
 
-    superset_estimated_correspondence_tract_idx= np.hstack(result_RLAP[:,0]) 
-    superset_estimated_correspondence_tract_cost= np.hstack(result_RLAP[:,1])
-    example_tract_len_med=np.median(np.hstack(result_RLAP[:,2]))
+    superset_estimated_correspondence_tract_idx= np.hstack(result_LAP[:,0]) 
+    superset_estimated_correspondence_tract_cost= np.hstack(result_LAP[:,1])
+    example_tract_len_med=np.median(np.hstack(result_LAP[:,2]))
     
     print("Ranking the estimated target (superset) tract.")
     superset_estimated_correspondence_tract_idx_ranked=ranking_schema(superset_estimated_correspondence_tract_idx,
@@ -196,7 +197,7 @@ def tract_correspondence_multiple_example_lap (kdt_T_A,  prototypes_T_A,example_
     print("Extracting the estimated target tract (until the median size (in terms of number of streamlines) of all the tracts from the example).")
     superset_estimated_correspondence_tract_idx_ranked_med=superset_estimated_correspondence_tract_idx_ranked[0:int(example_tract_len_med)]
 
-    #superset_estimated_target_tract= T_A [superset_estimated_correspondence_tract_idx_ranked]
+   
     segmented_tract_LAP=T_A [ superset_estimated_correspondence_tract_idx_ranked_med]
     
     
@@ -243,7 +244,7 @@ def tract_correspondence_multiple_example_NN (kdt_T_A,  prototypes_T_A,example_s
     print("Extracting the estimated target tract (superset) using the RLAP")
     n_jobs=-1
    
-      #result_RLAP= np.array(Parallel(n_jobs=n_jobs)(delayed(NN)(kdt, prototypes,sid,1,tractogram )for sid in   example_subject_id_list ))
+    
     result_NN= np.array(Parallel(n_jobs=n_jobs)(delayed(tract_segmentation_single_example_NN)(kdt_T_A,  prototypes_T_A,sid, num_NN,T_A ) for sid in   example_subject_id_list ))#euclidean                            
 
 
@@ -260,7 +261,7 @@ def tract_correspondence_multiple_example_NN (kdt_T_A,  prototypes_T_A,example_s
     print("Extracting the estimated target tract (until the median size (in terms of number of streamlines) of all the tracts from the example).")
     superset_estimated_correspondence_tract_idx_ranked_med=superset_estimated_correspondence_tract_idx_ranked[0:int(example_tract_len_med)]
 
-    #superset_estimated_target_tract= T_A [superset_estimated_correspondence_tract_idx_ranked]
+   
     segmented_tract_NN=T_A [ superset_estimated_correspondence_tract_idx_ranked_med]
     
     
