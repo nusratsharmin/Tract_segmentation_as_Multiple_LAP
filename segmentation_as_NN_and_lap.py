@@ -1,4 +1,5 @@
-"""White Matter Tract Segmentation as Multiple Linear Assignment Problems"""
+"""White Matter Tract Segmentation as Multiple Linear Assignment Problems
+"""
 
 import numpy as np
 from dissimilarity import compute_dissimilarity, dissimilarity
